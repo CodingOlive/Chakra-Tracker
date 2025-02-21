@@ -179,11 +179,13 @@
             const savedMaxChakra = localStorage.getItem('maxChakra');
             const savedReplenishRate = localStorage.getItem('replenishRate');
 
-            if (savedMaxChakra && savedReplenishRate) {
-                maxChakraInput.value = savedMaxChakra;
-                replenishRateInput.value = savedReplenishRate;
-                initializeTracker();
+            if (savedMaxChakra!== null) { 
+                maxChakraInput.value = savedMaxChakra; 
             }
+            if (savedReplenishRate!== null) { 
+                replenishRateInput.value = savedReplenishRate;
+            }
+            initializeTracker(); 
         }
 
         function updateDisplay() {
@@ -195,4 +197,16 @@
         }
 
         jutsuCostInput.addEventListener("keyup", function(event) {
-            if
+            if (event.key === "Enter") {
+                event.preventDefault();
+                if (chakraTracker) { 
+                    chakraTracker.addJutsu();
+                }
+            }
+        });
+
+        loadData();
+        setInterval(updateDisplay, 1000);
+    </script>
+</body>
+</html>

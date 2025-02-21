@@ -46,7 +46,7 @@
 
         function displayMessage(message, isError = true) {
             messageArea.textContent = message;
-            messageArea.style.color = isError ? "red" : "green";
+            messageArea.style.color = isError? "red": "green";
         }
 
         function initializeTracker() {
@@ -76,7 +76,36 @@
                 this.jutsuList = JSON.parse(localStorage.getItem('jutsuList')) || {};
             }
 
-            // ... (Other ChakraTracker methods - same as before)
+            replenish() {
+                const now = Date.now();
+                const timeElapsed = Math.floor((now - this.lastReplenishTime) / 1000);
+
+                if (this.replenishRate > 0 && timeElapsed >= 1) {
+                    const replenishAmount = this.replenishRate * timeElapsed;
+                    this.currentChakra = Math.min(this.currentChakra + replenishAmount, this.maxChakra);
+                    this.lastReplenishTime = now;
+                }
+            }
+
+            useChakra(amount) {
+                this.replenish();
+                if (amount > 0 && amount <= this.currentChakra) {
+                    this.currentChakra -= amount;
+                    return true;
+                }
+                return false;
+            }
+
+            recoverChakra() {
+                let amount = parseInt(prompt("Enter amount to recover:"));
+                if (!isNaN(amount) && amount > 0) {
+                    this.replenish();
+                    this.currentChakra = Math.min(this.currentChakra + amount, this.maxChakra);
+                    updateDisplay();
+                } else {
+                    alert("Invalid recovery amount.");
+                }
+            }
 
             addJutsu() {
                 const jutsuName = jutsuNameInput.value;
@@ -93,6 +122,20 @@
                 jutsuNameInput.value = "";
                 jutsuCostInput.value = "";
                 displayMessage("Jutsu added successfully!", false);
+            }
+
+            useJutsu() {
+                const jutsuName = document.getElementById("jutsuToUse").value;
+                if (this.jutsuList[jutsuName]) {
+                    if (this.useChakra(this.jutsuList[jutsuName])) {
+                        updateDisplay();
+                        displayMessage(`Used ${jutsuName} for ${this.jutsuList[jutsuName]} chakra.`, false);
+                    } else {
+                        displayMessage(`Not enough chakra for ${jutsuName}!`, true);
+                    }
+                } else {
+                    displayMessage("Jutsu not found.", true);
+                }
             }
 
             removeJutsu(jutsuToRemove) {
@@ -152,16 +195,4 @@
         }
 
         jutsuCostInput.addEventListener("keyup", function(event) {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                if (chakraTracker) { // Corrected this line
-                    chakraTracker.addJutsu();
-                }
-            }
-        });
-
-        loadData();
-        setInterval(updateDisplay, 1000);
-    </script>
-</body>
-</html>
+            if

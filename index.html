@@ -30,6 +30,11 @@
         <button onclick="displayJutsuList()">Display Jutsu List</button>
         <button onclick="recoverChakra()">Recover Chakra</button>
     </div>
+    <div>
+        <button onclick="saveData()">Save Data</button>
+        <input type="file" id="fileInput" accept=".txt">
+        <button onclick="loadData()">Load Data</button>
+    </div>
     <div id="jutsuList">
         <h2>Available Jutsu:</h2>
         <ul id="jutsuItems"></ul>
@@ -43,6 +48,7 @@
         const replenishRateInput = document.getElementById("replenishRate");
         const jutsuNameInput = document.getElementById("jutsuName");
         const jutsuCostInput = document.getElementById("jutsuCost");
+        const fileInput = document.getElementById("fileInput");
 
         function displayMessage(message, isError = true) {
             messageArea.textContent = message;
@@ -64,7 +70,6 @@
 
             chakraTracker = new ChakraTracker(maxChakra, replenishRate);
             updateDisplay();
-            saveData();
         }
 
         class ChakraTracker {
@@ -73,7 +78,7 @@
                 this.replenishRate = replenishRate;
                 this.currentChakra = this.maxChakra;
                 this.lastReplenishTime = Date.now();
-                this.jutsuList = JSON.parse(localStorage.getItem('jutsuList')) || {};
+                this.jutsuList = {}; // Initialize jutsuList here
             }
 
             replenish() {
@@ -169,23 +174,49 @@
 
         function saveData() {
             if (chakraTracker) {
-                localStorage.setItem('maxChakra', chakraTracker.maxChakra);
-                localStorage.setItem('replenishRate', chakraTracker.replenishRate);
-                localStorage.setItem('jutsuList', JSON.stringify(chakraTracker.jutsuList));
+                const data = {
+                    maxChakra: chakraTracker.maxChakra,
+                    replenishRate: chakraTracker.replenishRate,
+                    jutsuList: chakraTracker.jutsuList
+                };
+                const jsonData = JSON.stringify(data);
+                const blob = new Blob([jsonData], { type: "text/plain;charset=utf-8" });
+                const url = URL.createObjectURL(blob);
+
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = "Chakra.txt"; // Set the filename to "Chakra.txt"
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             }
         }
 
         function loadData() {
-            const savedMaxChakra = localStorage.getItem('maxChakra');
-            const savedReplenishRate = localStorage.getItem('replenishRate');
+            const file = fileInput.files;
+            if (file) {
+                if (file.name!== "Chakra.txt") {
+                    displayMessage("Invalid file name. Please select 'Chakra.txt'.", true);
+                    return;
+                }
 
-            if (savedMaxChakra!== null) { 
-                maxChakraInput.value = savedMaxChakra; 
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        maxChakraInput.value = data.maxChakra;
+                        replenishRateInput.value = data.replenishRate;
+                        initializeTracker();
+                        chakraTracker.jutsuList = data.jutsuList;
+                        displayJutsuList();
+                    } catch (error) {
+                        displayMessage("Error loading data from file.", true);
+                    }
+                };
+                reader.readAsText(file);
+            } else {
+                displayMessage("No file selected.", true);
             }
-            if (savedReplenishRate!== null) { 
-                replenishRateInput.value = savedReplenishRate;
-            }
-            initializeTracker(); 
         }
 
         function updateDisplay() {
@@ -199,13 +230,14 @@
         jutsuCostInput.addEventListener("keyup", function(event) {
             if (event.key === "Enter") {
                 event.preventDefault();
-                if (chakraTracker) { 
+                if (chakraTracker) {
                     chakraTracker.addJutsu();
                 }
             }
         });
 
-        loadData();
+        // Initialize the tracker when the page loads
+        initializeTracker();
         setInterval(updateDisplay, 1000);
     </script>
 </body>

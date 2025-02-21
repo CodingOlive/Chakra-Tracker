@@ -5,7 +5,7 @@
     <style>
         body { font-family: sans-serif; }
         #messageArea { margin-top: 10px; color: red; }
-        #jutsuItems li { cursor: context-menu; } /* Style for right-click */
+        #jutsuItems li { cursor: context-menu; }
     </style>
 </head>
 <body>
@@ -50,12 +50,30 @@
         }
 
         function initializeTracker() {
-            // ... (Initialization logic - same as before)
+            const maxChakra = parseInt(maxChakraInput.value);
+            const replenishRate = parseFloat(replenishRateInput.value);
+
+            if (isNaN(maxChakra) || maxChakra <= 0) {
+                displayMessage("Invalid Max Chakra.", true);
+                return;
+            }
+            if (isNaN(replenishRate) || replenishRate < 0) {
+                displayMessage("Invalid Replenish Rate.", true);
+                return;
+            }
+
+            chakraTracker = new ChakraTracker(maxChakra, replenishRate);
+            updateDisplay();
+            saveData();
         }
 
         class ChakraTracker {
             constructor(maxChakra, replenishRate = 0) {
-                // ... (Constructor - same as before)
+                this.maxChakra = maxChakra;
+                this.replenishRate = replenishRate;
+                this.currentChakra = this.maxChakra;
+                this.lastReplenishTime = Date.now();
+                this.jutsuList = JSON.parse(localStorage.getItem('jutsuList')) || {};
             }
 
             // ... (Other ChakraTracker methods - same as before)
@@ -96,7 +114,7 @@
                     const li = document.createElement("li");
                     li.textContent = `${jutsu}: ${this.jutsuList[jutsu]} chakra`;
                     li.addEventListener('contextmenu', (event) => {
-                        event.preventDefault(); // Prevent default right-click menu
+                        event.preventDefault();
                         if (confirm(`Delete ${jutsu}?`)) {
                             chakraTracker.removeJutsu(jutsu);
                         }
@@ -107,22 +125,36 @@
         }
 
         function saveData() {
-            // ... (Save data logic - same as before)
+            if (chakraTracker) {
+                localStorage.setItem('maxChakra', chakraTracker.maxChakra);
+                localStorage.setItem('replenishRate', chakraTracker.replenishRate);
+                localStorage.setItem('jutsuList', JSON.stringify(chakraTracker.jutsuList));
+            }
         }
 
         function loadData() {
-            // ... (Load data logic - same as before)
+            const savedMaxChakra = localStorage.getItem('maxChakra');
+            const savedReplenishRate = localStorage.getItem('replenishRate');
+
+            if (savedMaxChakra && savedReplenishRate) {
+                maxChakraInput.value = savedMaxChakra;
+                replenishRateInput.value = savedReplenishRate;
+                initializeTracker();
+            }
         }
 
         function updateDisplay() {
-            // ... (Update display logic - same as before)
+            if (chakraTracker) {
+                chakraTracker.replenish();
+                document.getElementById("currentChakra").textContent = chakraTracker.currentChakra;
+                document.getElementById("maxChakraDisplay").textContent = chakraTracker.maxChakra;
+            }
         }
 
-        // Add event listener for Enter key on jutsu input fields
         jutsuCostInput.addEventListener("keyup", function(event) {
             if (event.key === "Enter") {
                 event.preventDefault();
-                if(chakraTracker){
+                if (chakraTracker) { // Corrected this line
                     chakraTracker.addJutsu();
                 }
             }

@@ -6,36 +6,44 @@
         body { font-family: sans-serif; }
         #messageArea { margin-top: 10px; color: red; }
         #jutsuItems li { cursor: context-menu; }
+        #inputArea { 
+            border-bottom: 2px solid black; /* Add black bar below input area */
+            padding-bottom: 10px; 
+        }
     </style>
 </head>
 <body>
     <h1>Chakra Tracker</h1>
-    <div>
-        Max Chakra: <input type="number" id="maxChakra" value="10">
-        Replenish Rate: <input type="number" id="replenishRate" value="0">
-        <button onclick="initializeTracker()">Initialize</button>
-    </div>
-    <div id="chakraInfo">
-        Current Chakra: <span id="currentChakra">0</span>/<span id="maxChakraDisplay">0</span>
-    </div>
-    <div>
-        Jutsu Name: <input type="text" id="jutsuName">
-        Chakra Cost: <input type="number" id="jutsuCost">
-        <button onclick="addJutsu()">Add Jutsu</button> 
-    </div>
-    <div>
-        Jutsu to Use: <input type="text" id="jutsuToUse">
-        <button onclick="useJutsu()">Use Jutsu</button>
-    </div>
-    <div>
-        <button onclick="displayJutsuList()">Display Jutsu List</button>
-        <button onclick="recoverChakra()">Recover Chakra</button>
-    </div>
-    <div>
-        <button onclick="saveData()">Save Data</button>
-        <input type="file" id="fileInput" accept=".txt">
-        <button onclick="loadData()">Load Data</button>
-    </div>
+
+    <div id="inputArea">
+        <div>
+            Max Chakra: <input type="number" id="maxChakra" value="10">
+            Replenish Rate: <input type="number" id="replenishRate" value="0">
+            <button onclick="initializeTracker()">Initialize</button>
+        </div>
+        <div id="chakraInfo">
+            Current Chakra: <span id="currentChakra">0</span>/<span id="maxChakraDisplay">0</span>
+        </div>
+        <div>
+            Jutsu Name: <input type="text" id="jutsuName">
+            Chakra Cost: <input type="number" id="jutsuCost">
+            <button onclick="addJutsu()">Add Jutsu</button> 
+        </div>
+        <div>
+            Jutsu to Use: <input type="text" id="jutsuToUse">
+            <button onclick="useJutsu()">Use Jutsu</button>
+        </div>
+        <div>
+            <button onclick="displayJutsuList()">Display Jutsu List</button>
+            <button onclick="recoverChakra()">Recover Chakra</button>
+        </div>
+        <div>
+            <button onclick="saveData()">Save Data</button>
+            <input type="file" id="fileInput" accept=".txt">
+            <button onclick="loadData()">Load Data</button>
+        </div>
+    </div> 
+
     <div id="jutsuList">
         <h2>Available Jutsu:</h2>
         <ul id="jutsuItems"></ul>
@@ -79,7 +87,7 @@
                 this.replenishRate = replenishRate;
                 this.currentChakra = this.maxChakra;
                 this.lastReplenishTime = Date.now();
-                this.jutsuList = {}; // Initialize jutsuList here
+                this.jutsuList = {}; 
             }
 
             replenish() {
@@ -228,15 +236,12 @@
             }
         }
 
-        // Add jutsu when Enter key is pressed in the jutsuNameInput field
-        jutsuNameInput.addEventListener("keyup", function(event) {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                if (chakraTracker) {
-                    chakraTracker.addJutsu();
-                }
+        // Function to add jutsu (called by the button)
+        function addJutsu() {
+            if (chakraTracker) {
+                chakraTracker.addJutsu();
             }
-        });
+        }
 
         // Initialize the tracker when the page loads
         initializeTracker();

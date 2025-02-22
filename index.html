@@ -80,6 +80,7 @@
 
   <script>
     let chakraTracker;
+    let replenishInterval; // Variable to store the interval ID
     const messageArea = document.getElementById("messageArea");
     const maxChakraInput = document.getElementById("maxChakra");
     const replenishPercentInput = document.getElementById("replenishPercent"); // New input for replenish percent
@@ -105,8 +106,16 @@
         return;
       }
 
+      // Clear any existing intervals
+      if (typeof replenishInterval!== 'undefined') {
+        clearInterval(replenishInterval);
+      }
+
       chakraTracker = new ChakraTracker(maxChakra, replenishPercent);
       updateDisplay(); // Call updateDisplay() here to update the display
+
+      // Set the interval for automatic replenishment
+      replenishInterval = setInterval(updateDisplay, 1000);
     }
 
     class ChakraTracker {
@@ -117,37 +126,10 @@
         this.jutsuList = {};
       }
 
-      replenish() {
-        const replenishAmount = Math.floor((this.replenishPercent / 100) * this.maxChakra);
-        this.currentChakra = Math.min(this.currentChakra + replenishAmount, this.maxChakra);
-      }
-
-      useChakra(amount) {
-        if (amount > 0 && amount <= this.currentChakra) {
-          this.currentChakra -= amount;
-          return true;
-        }
-        return false;
-      }
-
-      recoverChakra() {
-        this.replenish(); // Replenish chakra when the button is clicked
-        updateDisplay();
-      }
-
-      //... (Other ChakraTracker methods - no changes)
+      //... (Other ChakraTracker methods)
     }
 
-    //... (Other functions - no changes)
-
-    function updateDisplay() {
-      if (chakraTracker) {
-        document.getElementById("currentChakra").textContent = chakraTracker.currentChakra.toLocaleString(); // Add comma formatting
-        document.getElementById("maxChakraDisplay").textContent = chakraTracker.maxChakra.toLocaleString(); // Add comma formatting
-      }
-    }
-
-    //... (Other functions - no changes)
+    //... (Other functions)
 
     // Initialize the tracker when the page loads
     initializeTracker();

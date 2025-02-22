@@ -63,10 +63,6 @@
       <button onclick="addJutsu()">Add Jutsu</button>
     </div>
     <div>
-      Jutsu to Use: <input type="text" id="jutsuToUse">
-      <button onclick="useJutsu()">Use Jutsu</button>
-    </div>
-    <div>
       <button onclick="recoverChakra()">Recover Chakra</button>
     </div>
     <div>
@@ -173,8 +169,7 @@
         displayMessage("Jutsu added successfully!", false);
       }
 
-      useJutsu() {
-        const jutsuName = document.getElementById("jutsuToUse").value;
+      useJutsu(jutsuName) { // Updated to accept jutsuName as a parameter
         if (this.jutsuList[jutsuName]) {
           if (this.useChakra(this.jutsuList[jutsuName])) {
             updateDisplay();
@@ -205,6 +200,12 @@
         for (const jutsu in this.jutsuList) {
           const li = document.createElement("li");
           li.textContent = `${jutsu}: ${this.jutsuList[jutsu]} chakra`;
+
+          // Add click event listener to use jutsu
+          li.addEventListener('click', () => {
+            this.useJutsu(jutsu); // Use 'this' to refer to the ChakraTracker instance
+          });
+
           li.addEventListener('contextmenu', (event) => {
             event.preventDefault();
             if (confirm(`Delete ${jutsu}?`)) {

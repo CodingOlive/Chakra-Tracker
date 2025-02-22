@@ -51,7 +51,7 @@
   <div id="inputArea">
     <div>
       Max Chakra: <input type="number" id="maxChakra" value="10">
-      Replenish Rate: <input type="number" id="replenishRate" value="0">
+      Replenish %: <input type="number" id="replenishPercent" value="0">
       <button onclick="initializeTracker()">Initialize</button>
     </div>
     <div id="chakraInfo">
@@ -82,7 +82,7 @@
     let chakraTracker;
     const messageArea = document.getElementById("messageArea");
     const maxChakraInput = document.getElementById("maxChakra");
-    const replenishRateInput = document.getElementById("replenishRate");
+    const replenishPercentInput = document.getElementById("replenishPercent"); // New input for replenish percent
     const jutsuNameInput = document.getElementById("jutsuName");
     const jutsuCostInput = document.getElementById("jutsuCost");
     const fileInput = document.getElementById("fileInput");
@@ -94,43 +94,35 @@
 
     function initializeTracker() {
       const maxChakra = parseInt(maxChakraInput.value);
-      const replenishRate = parseFloat(replenishRateInput.value);
+      const replenishPercent = parseFloat(replenishPercentInput.value);
 
       if (isNaN(maxChakra) || maxChakra <= 0) {
         displayMessage("Invalid Max Chakra.", true);
         return;
       }
-      if (isNaN(replenishRate) || replenishRate < 0) {
-        displayMessage("Invalid Replenish Rate.", true);
+      if (isNaN(replenishPercent) || replenishPercent < 0 || replenishPercent > 100) {
+        displayMessage("Invalid Replenish Percent. Must be between 0 and 100.", true);
         return;
       }
 
-      chakraTracker = new ChakraTracker(maxChakra, replenishRate);
+      chakraTracker = new ChakraTracker(maxChakra, replenishPercent);
       updateDisplay(); // Call updateDisplay() here to update the display
     }
 
     class ChakraTracker {
-      constructor(maxChakra, replenishRate = 0) {
+      constructor(maxChakra, replenishPercent = 0) {
         this.maxChakra = maxChakra;
-        this.replenishRate = replenishRate;
+        this.replenishPercent = replenishPercent;
         this.currentChakra = this.maxChakra;
-        this.lastReplenishTime = Date.now();
         this.jutsuList = {};
       }
 
       replenish() {
-        const now = Date.now();
-        const timeElapsed = Math.floor((now - this.lastReplenishTime) / 1000);
-
-        if (this.replenishRate > 0 && timeElapsed >= 1) {
-          const replenishAmount = this.replenishRate * timeElapsed;
-          this.currentChakra = Math.min(this.currentChakra + replenishAmount, this.maxChakra);
-          this.lastReplenishTime = now;
-        }
+        const replenishAmount = Math.floor((this.replenishPercent / 100) * this.maxChakra);
+        this.currentChakra = Math.min(this.currentChakra + replenishAmount, this.maxChakra);
       }
 
       useChakra(amount) {
-        this.replenish();
         if (amount > 0 && amount <= this.currentChakra) {
           this.currentChakra -= amount;
           return true;
@@ -139,14 +131,8 @@
       }
 
       recoverChakra() {
-        let amount = parseInt(prompt("Enter amount to recover:"));
-        if (!isNaN(amount) && amount > 0) {
-          this.replenish();
-          this.currentChakra = Math.min(this.currentChakra + amount, this.maxChakra);
-          updateDisplay();
-        } else {
-          alert("Invalid recovery amount.");
-        }
+        this.replenish(); // Replenish chakra when the button is clicked
+        updateDisplay();
       }
 
       addJutsu() {
@@ -159,7 +145,7 @@
         }
 
         this.jutsuList[jutsuName] = chakraCost;
-        this.displayJutsuList(); // Call displayJutsuList() here to update in real-time
+        this.displayJutsuList();
         saveData();
 
         // Clear the input fields
@@ -169,7 +155,7 @@
         displayMessage("Jutsu added successfully!", false);
       }
 
-      useJutsu(jutsuName) { // Updated to accept jutsuName as a parameter
+      useJutsu(jutsuName) {
         if (this.jutsuList[jutsuName]) {
           if (this.useChakra(this.jutsuList[jutsuName])) {
             updateDisplay();
@@ -203,7 +189,7 @@
 
           // Add click event listener to use jutsu
           li.addEventListener('click', () => {
-            this.useJutsu(jutsu); // Use 'this' to refer to the ChakraTracker instance
+            this.useJutsu(jutsu);
           });
 
           li.addEventListener('contextmenu', (event) => {
@@ -227,7 +213,6 @@
 
     function updateDisplay() {
       if (chakraTracker) {
-        chakraTracker.replenish();
         document.getElementById("currentChakra").textContent = chakraTracker.currentChakra;
         document.getElementById("maxChakraDisplay").textContent = chakraTracker.maxChakra;
       }
@@ -242,7 +227,6 @@
 
     // Initialize the tracker when the page loads
     initializeTracker();
-    setInterval(updateDisplay, 1000);
   </script>
 </body>
 </html>

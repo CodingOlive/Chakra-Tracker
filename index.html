@@ -165,8 +165,11 @@
         this.jutsuList[jutsuName] = chakraCost;
         this.displayJutsuList(); // Call displayJutsuList() here to update in real-time
         saveData();
+
+        // Clear the input fields
         jutsuNameInput.value = "";
         jutsuCostInput.value = "";
+
         displayMessage("Jutsu added successfully!", false);
       }
 

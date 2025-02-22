@@ -122,10 +122,122 @@
         this.jutsuList = {};
       }
 
-      //... (Other ChakraTracker methods)
+      replenish() {
+        const now = Date.now();
+        const timeElapsed = Math.floor((now - this.lastReplenishTime) / 1000);
+
+        if (this.replenishRate > 0 && timeElapsed >= 1) {
+          const replenishAmount = this.replenishRate * timeElapsed;
+          this.currentChakra = Math.min(this.currentChakra + replenishAmount, this.maxChakra);
+          this.lastReplenishTime = now;
+        }
+      }
+
+      useChakra(amount) {
+        this.replenish();
+        if (amount > 0 && amount <= this.currentChakra) {
+          this.currentChakra -= amount;
+          return true;
+        }
+        return false;
+      }
+
+      recoverChakra() {
+        let amount = parseInt(prompt("Enter amount to recover:"));
+        if (!isNaN(amount) && amount > 0) {
+          this.replenish();
+          this.currentChakra = Math.min(this.currentChakra + amount, this.maxChakra);
+          updateDisplay();
+        } else {
+          alert("Invalid recovery amount.");
+        }
+      }
+
+      addJutsu() {
+        const jutsuName = jutsuNameInput.value;
+        const chakraCost = parseInt(jutsuCostInput.value);
+
+        if (!jutsuName || isNaN(chakraCost) || chakraCost <= 0) {
+          displayMessage("Invalid jutsu name or chakra cost.", true);
+          return;
+        }
+
+        this.jutsuList[jutsuName] = chakraCost;
+        this.displayJutsuList(); // Call displayJutsuList() here to update in real-time
+        saveData();
+
+        // Clear the input fields
+        jutsuNameInput.value = "";
+        jutsuCostInput.value = "";
+
+        displayMessage("Jutsu added successfully!", false);
+      }
+
+      useJutsu() {
+        const jutsuName = document.getElementById("jutsuToUse").value;
+        if (this.jutsuList[jutsuName]) {
+          if (this.useChakra(this.jutsuList[jutsuName])) {
+            updateDisplay();
+            displayMessage(`Used ${jutsuName} for ${this.jutsuList[jutsuName]} chakra.`, false);
+          } else {
+            displayMessage(`Not enough chakra for ${jutsuName}!`, true);
+          }
+        } else {
+          displayMessage("Jutsu not found.", true);
+        }
+      }
+
+      removeJutsu(jutsuToRemove) {
+        if (this.jutsuList[jutsuToRemove]) {
+          delete this.jutsuList[jutsuToRemove];
+          displayJutsuList();
+          saveData();
+          displayMessage("Jutsu removed successfully!", false);
+        } else {
+          displayMessage("Jutsu not found.", true);
+        }
+      }
+
+      displayJutsuList() {
+        const jutsuListElement = document.getElementById("jutsuItems");
+        jutsuListElement.innerHTML = "";
+
+        for (const jutsu in this.jutsuList) {
+          const li = document.createElement("li");
+          li.textContent = `${jutsu}: ${this.jutsuList[jutsu]} chakra`;
+          li.addEventListener('contextmenu', (event) => {
+            event.preventDefault();
+            if (confirm(`Delete ${jutsu}?`)) {
+              chakraTracker.removeJutsu(jutsu);
+            }
+          });
+          jutsuListElement.appendChild(li);
+        }
+      }
     }
 
-    //... (Other functions)
+    function saveData() {
+      //... (saveData function - no changes)
+    }
+
+    function loadData() {
+      //... (loadData function - no changes)
+    }
+
+    function updateDisplay() {
+      if (chakraTracker) {
+        chakraTracker.replenish();
+        document.getElementById("currentChakra").textContent = chakraTracker.currentChakra;
+        document.getElementById("maxChakraDisplay").textContent = chakraTracker.maxChakra;
+      }
+    }
+
+    // Function to add jutsu (called by the button)
+    function addJutsu() {
+      if (chakraTracker) {
+        chakraTracker.addJutsu();
+      }
+    }
 
     // Initialize the tracker when the page loads
     initializeTracker();

@@ -140,11 +140,11 @@
       }
 
       recoverChakra() {
-        this.replenish(); // Replenish chakra when the button is clicked
+        this.replenish();
         updateDisplay();
       }
 
-      addJutsu() { // This is the ChakraTracker's addJutsu
+      addJutsu() {
         const jutsuName = jutsuNameInput.value;
         const chakraCost = parseInt(jutsuCostInput.value);
 
@@ -221,15 +221,20 @@
 
     function updateDisplay() {
       if (chakraTracker) {
-        document.getElementById("currentChakra").textContent = chakraTracker.currentChakra.toLocaleString(); // Add comma formatting
-        document.getElementById("maxChakraDisplay").textContent = chakraTracker.maxChakra.toLocaleString(); // Add comma formatting
+        document.getElementById("currentChakra").textContent = chakraTracker.currentChakra.toLocaleString();
+        document.getElementById("maxChakraDisplay").textContent = chakraTracker.maxChakra.toLocaleString();
       }
     }
 
-    // Function to add jutsu (called by the button)
-    function addJutsu() { // This is the global addJutsu
+    function addJutsu() {
       if (chakraTracker) {
-        chakraTracker.addJutsu(); // Call the ChakraTracker's addJutsu
+        chakraTracker.addJutsu();
+      }
+    }
+
+    function recoverChakra() {
+      if (chakraTracker) {
+        chakraTracker.recoverChakra();
       }
     }
 

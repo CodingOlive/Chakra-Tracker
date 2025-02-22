@@ -144,7 +144,7 @@
         updateDisplay();
       }
 
-      addJutsu() {
+      addJutsu() { // This is the ChakraTracker's addJutsu
         const jutsuName = jutsuNameInput.value;
         const chakraCost = parseInt(jutsuCostInput.value);
 
@@ -154,17 +154,16 @@
         }
 
         this.jutsuList[jutsuName] = chakraCost;
-        this.displayJutsuList(); // Call displayJutsuList() to update in real-time
+        this.displayJutsuList();
         saveData();
 
-        // Clear the input fields
         jutsuNameInput.value = "";
         jutsuCostInput.value = "";
 
         displayMessage("Jutsu added successfully!", false);
       }
 
-      useJutsu(jutsuName) { // Updated to accept jutsuName as a parameter
+      useJutsu(jutsuName) {
         if (this.jutsuList[jutsuName]) {
           if (this.useChakra(this.jutsuList[jutsuName])) {
             updateDisplay();
@@ -228,9 +227,9 @@
     }
 
     // Function to add jutsu (called by the button)
-    function addJutsu() {
+    function addJutsu() { // This is the global addJutsu
       if (chakraTracker) {
-        chakraTracker.addJutsu();
+        chakraTracker.addJutsu(); // Call the ChakraTracker's addJutsu
       }
     }
 

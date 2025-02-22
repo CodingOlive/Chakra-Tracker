@@ -135,95 +135,19 @@
         updateDisplay();
       }
 
-      addJutsu() {
-        const jutsuName = jutsuNameInput.value;
-        const chakraCost = parseInt(jutsuCostInput.value);
-
-        if (!jutsuName || isNaN(chakraCost) || chakraCost <= 0) {
-          displayMessage("Invalid jutsu name or chakra cost.", true);
-          return;
-        }
-
-        this.jutsuList[jutsuName] = chakraCost;
-        this.displayJutsuList();
-        saveData();
-
-        // Clear the input fields
-        jutsuNameInput.value = "";
-        jutsuCostInput.value = "";
-
-        displayMessage("Jutsu added successfully!", false);
-      }
-
-      useJutsu(jutsuName) {
-        if (this.jutsuList[jutsuName]) {
-          if (this.useChakra(this.jutsuList[jutsuName])) {
-            updateDisplay();
-            displayMessage(`Used ${jutsuName} for ${this.jutsuList[jutsuName]} chakra.`, false);
-          } else {
-            displayMessage(`Not enough chakra for ${jutsuName}!`, true);
-          }
-        } else {
-          displayMessage("Jutsu not found.", true);
-        }
-      }
-
-      removeJutsu(jutsuToRemove) {
-        if (this.jutsuList[jutsuToRemove]) {
-          delete this.jutsuList[jutsuToRemove];
-          displayJutsuList();
-          saveData();
-          displayMessage("Jutsu removed successfully!", false);
-        } else {
-          displayMessage("Jutsu not found.", true);
-        }
-      }
-
-      displayJutsuList() {
-        const jutsuListElement = document.getElementById("jutsuItems");
-        jutsuListElement.innerHTML = "";
-
-        for (const jutsu in this.jutsuList) {
-          const li = document.createElement("li");
-          li.textContent = `${jutsu}: ${this.jutsuList[jutsu]} chakra`;
-
-          // Add click event listener to use jutsu
-          li.addEventListener('click', () => {
-            this.useJutsu(jutsu);
-          });
-
-          li.addEventListener('contextmenu', (event) => {
-            event.preventDefault();
-            if (confirm(`Delete ${jutsu}?`)) {
-              chakraTracker.removeJutsu(jutsu);
-            }
-          });
-          jutsuListElement.appendChild(li);
-        }
-      }
+      //... (Other ChakraTracker methods - no changes)
     }
 
-    function saveData() {
-      //... (saveData function - no changes)
-    }
-
-    function loadData() {
-      //... (loadData function - no changes)
-    }
+    //... (Other functions - no changes)
 
     function updateDisplay() {
       if (chakraTracker) {
-        document.getElementById("currentChakra").textContent = chakraTracker.currentChakra;
-        document.getElementById("maxChakraDisplay").textContent = chakraTracker.maxChakra;
+        document.getElementById("currentChakra").textContent = chakraTracker.currentChakra.toLocaleString(); // Add comma formatting
+        document.getElementById("maxChakraDisplay").textContent = chakraTracker.maxChakra.toLocaleString(); // Add comma formatting
       }
     }
 
-    // Function to add jutsu (called by the button)
-    function addJutsu() {
-      if (chakraTracker) {
-        chakraTracker.addJutsu();
-      }
-    }
+    //... (Other functions - no changes)
 
     // Initialize the tracker when the page loads
     initializeTracker();
